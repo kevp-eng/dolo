@@ -18,6 +18,8 @@
     --text-light:#f5eeff;
     --text-muted:#c7b6e8;
     --line:rgba(247,236,255,0.14);
+    --ground-deep:#2a2140;
+    --ground-mid:#3a2f5c;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   html{scroll-behavior:smooth;}
@@ -167,6 +169,70 @@
   .meter-handle{position:absolute; top:50%; left:100%; width:24px; height:24px; border-radius:50%; background:var(--gold); border:3px solid var(--bg-deep); transform:translate(-50%,-50%); cursor:grab; box-shadow:0 2px 8px rgba(0,0,0,0.35);}
   .meter-label{margin-top:14px; font-family:'Caveat',cursive; font-size:1.6rem; color:var(--blush);}
   .meter-hint{margin-top:4px; font-size:0.78rem; color:var(--text-muted); letter-spacing:0.08em;}
+
+  /* GARDEN FINALE */
+  #garden-section{padding-top:60px;}
+  .mic-control{max-width:360px; margin:30px auto 0; text-align:center;}
+  #mic-btn{
+    background:linear-gradient(120deg,var(--lavender),var(--blush)); border:none; color:#2a1a3d;
+    font-family:'Quicksand',sans-serif; font-weight:700; padding:13px 28px; border-radius:30px;
+    cursor:pointer; font-size:0.92rem; box-shadow:0 8px 20px rgba(183,156,237,0.3);
+  }
+  #mic-btn:disabled{opacity:0.55; cursor:default; box-shadow:none;}
+  .blow-meter{margin-top:14px; height:8px; border-radius:6px; background:rgba(255,255,255,0.08); border:1px solid var(--line); overflow:hidden;}
+  .blow-meter-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--lavender),var(--gold)); transition:width 0.08s linear;}
+  .mic-status{margin-top:10px; font-size:0.8rem; color:var(--text-muted); letter-spacing:0.02em;}
+  .garden-counter-line{margin-top:18px; font-family:'Caveat',cursive; font-size:1.4rem; color:var(--blush);}
+  #garden-bed{
+    position:relative; margin:36px auto 0; width:100%; max-width:820px; height:min(480px,58vh);
+    background:radial-gradient(ellipse at 50% 100%, var(--ground-mid), var(--ground-deep) 70%);
+    border-radius:28px; border:1px solid var(--line); cursor:pointer; overflow:hidden;
+    box-shadow:inset 0 0 60px rgba(0,0,0,0.35);
+    touch-action:none; -webkit-touch-callout:none; user-select:none;
+  }
+  #garden-bed::before{
+    content:''; position:absolute; inset:0;
+    background-image:radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px);
+    background-size:26px 26px; opacity:0.25; pointer-events:none;
+  }
+  .empty-hint{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; text-align:center; padding:20px; color:var(--text-muted); font-family:'Caveat',cursive; font-size:1.6rem; pointer-events:none; transition:opacity 0.4s ease;}
+  .empty-hint.hide{opacity:0;}
+  .flower{
+    position:absolute; font-size:2rem; transform:translate(-50%,-50%) scale(0); cursor:pointer;
+    animation:bloom 0.6s cubic-bezier(.34,1.6,.64,1) forwards; filter:drop-shadow(0 0 8px rgba(255,217,166,0.25));
+  }
+  @keyframes bloom{
+    0%{transform:translate(-50%,-50%) scale(0) rotate(-20deg);}
+    70%{transform:translate(-50%,-50%) scale(1.25) rotate(6deg);}
+    100%{transform:translate(-50%,-50%) scale(1) rotate(0deg);}
+  }
+  .flower:hover{filter:drop-shadow(0 0 14px rgba(255,217,166,0.55));}
+  @keyframes pop-settle{0%{transform:translate(-50%,-50%) scale(1.15);} 100%{transform:translate(-50%,-50%) scale(1);}}
+  .garden-toast{
+    position:fixed; left:50%; bottom:8%; transform:translate(-50%,20px); background:linear-gradient(145deg,var(--blush),var(--lavender));
+    color:#2a1a3d; font-family:'Caveat',cursive; font-size:1.35rem; font-weight:700; padding:14px 26px; border-radius:16px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.35); opacity:0; transition:opacity 0.4s ease, transform 0.4s ease; z-index:20; max-width:80vw; text-align:center;
+  }
+  .garden-toast.show{opacity:1; transform:translate(-50%,0);}
+  .progress-wrap{max-width:400px; margin:26px auto 0; text-align:center;}
+  .progress-track{height:8px; border-radius:6px; background:rgba(255,255,255,0.08); border:1px solid var(--line); overflow:hidden;}
+  .progress-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--lavender),var(--blush),var(--gold)); transition:width 0.5s ease;}
+  .progress-label{margin-top:10px; font-size:0.8rem; color:var(--text-muted); letter-spacing:0.08em;}
+  #finale{
+    text-align:center; max-width:560px; margin:60px auto 0; padding:0 24px;
+    opacity:0; transform:translateY(30px); transition:opacity 1s ease, transform 1s ease; pointer-events:none;
+  }
+  #finale.show{opacity:1; transform:translateY(0); pointer-events:auto;}
+  #finale h2{font-size:clamp(1.8rem,5vw,2.6rem); margin-bottom:18px;}
+  #finale p{color:var(--text-muted); line-height:1.7; font-size:1.05rem; margin-bottom:10px;}
+  #finale .sign{margin-top:26px; font-family:'Caveat',cursive; font-size:1.7rem; color:var(--gold);}
+  .confetti{position:fixed; top:-20px; font-size:1.2rem; z-index:15; pointer-events:none; animation:fall linear forwards;}
+  @keyframes fall{to{transform:translateY(110vh) rotate(360deg); opacity:0.2;}}
+
+  @media(max-width:600px){
+    #garden-bed{height:52vh;}
+    .flower{font-size:1.6rem;}
+  }
 </style>
 </head>
 <body>
@@ -282,6 +348,38 @@
   <div class="secret" id="secret">Whatever timezone you're in, I'm looking at the same moon, thinking about the same girl. I love you, dolo. — your idiot</div>
   <div class="signature script">made with way too much love, for you.</div>
 </footer>
+
+<!-- GARDEN FINALE (very last thing on the page) -->
+<section id="garden-section">
+  <div class="section-head">
+    <span class="eyebrow">plant something with me</span>
+    <h2>One last thing, dolo</h2>
+    <p>Tap a spot below, then blow gently into your mic — like blowing a dandelion — and watch something grow.</p>
+    <div class="garden-counter-line">this whole garden only exists because of you 🌱</div>
+  </div>
+
+  <div class="mic-control">
+    <button id="mic-btn">🎤 Enable mic to blow</button>
+    <div class="blow-meter"><div class="blow-meter-fill" id="blow-meter-fill"></div></div>
+    <div class="mic-status" id="mic-status">tap the button, then allow microphone access</div>
+  </div>
+
+  <div id="garden-bed">
+    <div class="empty-hint" id="empty-hint">tap here to plant a seed</div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+    <div class="progress-label" id="progress-label">0 / 10 planted</div>
+  </div>
+
+  <div id="finale">
+    <h2>Look what we grew.</h2>
+    <p>Every one of these started as nothing — just a breath, a little effort. Kind of like us, honestly. Long distance never had a chance against how much I actually love you.</p>
+    <p>This whole garden, the whole site, all of it — it's just a very long way of saying the same short thing.</p>
+    <div class="sign script">I love you, dolo. Always have, always will. — your idiot</div>
+  </div>
+</section>
 
 <script>
 // ---------- ENVELOPE INTRO ----------
@@ -538,6 +636,216 @@ moon.addEventListener('click',()=>{
     hint.textContent = `${5-taps} more...`;
   }
 });
+
+// ---------- GARDEN FINALE ----------
+const gardenMessages = [
+  "This garden only grows because of you.",
+  "Every flower here is something I love about you.",
+  "You make ordinary days feel like spring.",
+  "Long distance couldn't wilt this, not even a little.",
+  "You're my favorite bloom in any season.",
+  "Every seed I plant, I plant thinking of you.",
+  "Dolo, you're the prettiest thing in any garden, real or not.",
+  "Even miles apart, I keep growing something for you.",
+  "This whole garden is just a very slow love letter.",
+  "I love you more than every flower here — and that's saying a lot."
+];
+const flowerEmojis = ['🌸','🌷','🌼','🌺','💮','🌻'];
+
+const bed = document.getElementById('garden-bed');
+const emptyHint = document.getElementById('empty-hint');
+const progressFill = document.getElementById('progress-fill');
+const progressLabel = document.getElementById('progress-label');
+const finale = document.getElementById('finale');
+const micBtn = document.getElementById('mic-btn');
+const micStatus = document.getElementById('mic-status');
+const blowMeterFill = document.getElementById('blow-meter-fill');
+const gardenTotal = gardenMessages.length;
+
+let planted = 0;
+let gardenToastTimer;
+let growEl = null;
+let growProgress = 0;
+const GROW_DURATION = 1400; // ms of sustained blowing (or holding) to fully bloom
+const BLOW_THRESHOLD = 0.05; // RMS level counted as "blowing"
+
+let micEnabled = false;
+let analyser = null;
+let micDataArray = null;
+
+function showGardenToast(text){
+  let toast = document.querySelector('.garden-toast');
+  if(!toast){
+    toast = document.createElement('div');
+    toast.className = 'garden-toast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = text;
+  toast.classList.add('show');
+  clearTimeout(gardenToastTimer);
+  gardenToastTimer = setTimeout(()=>toast.classList.remove('show'), 2600);
+}
+
+function spawnGardenConfetti(){
+  const emojis = ['💜','✨','💗','🌸'];
+  for(let i=0;i<24;i++){
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    c.style.left = Math.random()*100+'vw';
+    c.style.animationDuration = (2.5+Math.random()*2)+'s';
+    c.style.animationDelay = (Math.random()*0.6)+'s';
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(), 5000);
+  }
+}
+
+function placeSeed(x, y){
+  if(growEl || planted >= gardenTotal) return;
+  growProgress = 0;
+  growEl = document.createElement('div');
+  growEl.className = 'flower';
+  growEl.style.animation = 'none';
+  growEl.textContent = '🌱';
+  growEl.style.left = x + 'px';
+  growEl.style.top = y + 'px';
+  growEl.style.transform = 'translate(-50%,-50%) scale(0.25)';
+  growEl.style.opacity = '0.5';
+  bed.appendChild(growEl);
+  emptyHint.classList.add('hide');
+}
+
+function updateSeedVisual(){
+  if(!growEl) return;
+  const scale = 0.25 + growProgress * 0.95;
+  growEl.style.transform = `translate(-50%,-50%) scale(${scale})`;
+  growEl.style.opacity = String(0.5 + growProgress * 0.5);
+  growEl.textContent = growProgress < 0.45 ? '🌱' : flowerEmojis[planted % flowerEmojis.length];
+  if(growProgress >= 1){
+    bloomSeed();
+  }
+}
+
+function bloomSeed(){
+  const flower = growEl;
+  growEl = null;
+  growProgress = 0;
+  flower.style.transform = 'translate(-50%,-50%) scale(1)';
+  flower.style.opacity = '1';
+  flower.style.animation = 'pop-settle 0.3s ease forwards';
+
+  const msg = gardenMessages[planted];
+  flower.addEventListener('click', (ev)=>{ ev.stopPropagation(); showGardenToast(msg); });
+
+  showGardenToast(msg);
+  planted++;
+
+  const pct = Math.round((planted / gardenTotal) * 100);
+  progressFill.style.width = pct + '%';
+  progressLabel.textContent = `${planted} / ${gardenTotal} planted`;
+
+  if(planted === gardenTotal){
+    setTimeout(()=>{
+      finale.classList.add('show');
+      spawnGardenConfetti();
+      finale.scrollIntoView({behavior:'smooth', block:'center'});
+    }, 900);
+  }
+}
+
+function wiltSeed(){
+  if(!growEl) return;
+  const el = growEl;
+  growEl = null;
+  growProgress = 0;
+  el.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+  el.style.transform = 'translate(-50%,-50%) scale(0)';
+  el.style.opacity = '0';
+  setTimeout(()=>el.remove(), 320);
+}
+
+// tap the bed: plant a seed at that spot
+bed.addEventListener('pointerdown', (e)=>{
+  if(e.target.classList.contains('flower')) return;
+  const rect = bed.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  if(!growEl) placeSeed(x, y);
+});
+
+// ---------- MIC / BLOW DETECTION ----------
+micBtn.addEventListener('click', async ()=>{
+  micBtn.disabled = true;
+  micBtn.textContent = 'Requesting mic access...';
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({ audio:true });
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    const audioCtx = new AudioContextClass();
+    const source = audioCtx.createMediaStreamSource(stream);
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 1024;
+    micDataArray = new Uint8Array(analyser.fftSize);
+    source.connect(analyser);
+    micEnabled = true;
+    micBtn.style.display = 'none';
+    micStatus.textContent = 'tap a spot, then blow into your mic to grow it 🌬️';
+  } catch(err){
+    micEnabled = false;
+    micBtn.textContent = 'Mic unavailable';
+    micBtn.disabled = true;
+    micStatus.textContent = 'no worries — press and hold a spot instead 🌱';
+  }
+});
+
+let lastFrameTime = performance.now();
+function gardenFrame(now){
+  requestAnimationFrame(gardenFrame);
+  const dt = Math.min(now - lastFrameTime, 100);
+  lastFrameTime = now;
+
+  if(micEnabled && analyser){
+    analyser.getByteTimeDomainData(micDataArray);
+    let sumSquares = 0;
+    for(let i=0;i<micDataArray.length;i++){
+      const v = (micDataArray[i] - 128) / 128;
+      sumSquares += v * v;
+    }
+    const rms = Math.sqrt(sumSquares / micDataArray.length);
+    blowMeterFill.style.width = Math.min(rms / 0.18, 1) * 100 + '%';
+
+    if(growEl){
+      if(rms > BLOW_THRESHOLD){
+        growProgress = Math.min(growProgress + dt / GROW_DURATION, 1);
+      } else {
+        growProgress = Math.max(growProgress - dt / (GROW_DURATION * 1.6), 0);
+      }
+      updateSeedVisual();
+    }
+  }
+}
+requestAnimationFrame(gardenFrame);
+
+// ---------- FALLBACK: press & hold (used automatically if mic isn't enabled) ----------
+let holding = false;
+bed.addEventListener('pointerdown', ()=>{ if(!micEnabled) holding = true; });
+window.addEventListener('pointerup', ()=>{ holding = false; });
+window.addEventListener('pointercancel', ()=>{ holding = false; });
+bed.addEventListener('pointerleave', (e)=>{ if(e.target === bed) holding = false; });
+
+let lastHoldTime = performance.now();
+function holdFallbackFrame(now){
+  requestAnimationFrame(holdFallbackFrame);
+  const dt = Math.min(now - lastHoldTime, 100);
+  lastHoldTime = now;
+  if(micEnabled || !growEl) return;
+  if(holding){
+    growProgress = Math.min(growProgress + dt / GROW_DURATION, 1);
+    updateSeedVisual();
+  } else {
+    wiltSeed();
+  }
+}
+requestAnimationFrame(holdFallbackFrame);
 </script>
 </body>
 </html>
