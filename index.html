@@ -158,8 +158,23 @@
   #kiss-btn:active{transform:scale(0.94);}
   .kiss-count{margin-top:16px; color:var(--text-muted); font-size:0.9rem;}
   .kiss-count b{color:var(--gold); font-size:1.3rem;}
+  #kiss-total.infinity{color:var(--gold); text-shadow:0 0 14px rgba(255,217,166,0.6);}
+  @keyframes infinity-pulse{0%{transform:scale(1);} 40%{transform:scale(1.4);} 100%{transform:scale(1);}}
+  #kiss-total.pulse{display:inline-block; animation:infinity-pulse 0.5s ease;}
+  .kiss-infinity-note{font-family:'Caveat',cursive; font-size:1.05rem; color:var(--blush); margin-top:6px;}
+  .kiss-infinity-note.hidden{display:none;}
   .kiss-burst{position:fixed; pointer-events:none; font-size:1.4rem; z-index:99; animation:kiss-pop 1.1s ease-out forwards;}
   @keyframes kiss-pop{0%{opacity:1; transform:translate(0,0) scale(0.6);} 100%{opacity:0; transform:translate(var(--kx),var(--ky)) scale(1.3);}}
+
+  /* SAVED-MESSAGES LOG (used by the garden) */
+  .link-btn{background:none; border:none; color:var(--text-muted); font-family:'Quicksand',sans-serif; font-size:0.8rem; text-decoration:underline; text-underline-offset:3px; cursor:pointer; margin-top:16px; letter-spacing:0.03em;}
+  .link-btn:hover{color:var(--lavender-soft);}
+  .kiss-log{max-width:360px; margin:16px auto 0; text-align:left; background:rgba(255,255,255,0.04); border:1px solid var(--line); border-radius:14px; padding:14px 18px; max-height:220px; overflow-y:auto;}
+  .kiss-log.hidden{display:none;}
+  .kiss-log .empty{color:var(--text-muted); font-size:0.85rem; text-align:center;}
+  .kiss-log-item{font-size:0.85rem; color:var(--text-muted); padding:6px 0; border-bottom:1px solid var(--line);}
+  .kiss-log-item:last-child{border-bottom:none;}
+  .kiss-log-item b{color:var(--gold);}
 
   /* LOVE METER */
   .meter-wrap{max-width:420px; margin:44px auto 0; text-align:center;}
@@ -338,6 +353,7 @@
   </div>
   <button id="kiss-btn">Blow a kiss 😘</button>
   <div class="kiss-count">Kisses sent: <b id="kiss-total">0</b></div>
+  <div class="kiss-infinity-note hidden" id="kiss-infinity-note">turns out it was always infinite</div>
 </section>
 
 <!-- TIMELINE -->
@@ -403,6 +419,10 @@
   <div class="progress-wrap">
     <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
     <div class="progress-label" id="progress-label">0 / 10 planted</div>
+    <button class="link-btn" id="toggle-garden-log">view saved messages</button>
+    <div class="kiss-log hidden" id="garden-log">
+      <div class="empty">nothing grown yet</div>
+    </div>
   </div>
 
   <div id="finale">
@@ -467,12 +487,47 @@ setInterval(spawnAmbientHeart, 1800);
 // ---------- KISS BUTTON ----------
 const kissBtn = document.getElementById('kiss-btn');
 const kissTotalEl = document.getElementById('kiss-total');
+const kissInfinityNote = document.getElementById('kiss-infinity-note');
 let kissTotal = parseInt(localStorage.getItem('dolo-kiss-total') || '0', 10);
-kissTotalEl.textContent = kissTotal;
+let infinityRevealed = localStorage.getItem('dolo-kiss-infinity') === '1';
+if(infinityRevealed){
+  kissTotalEl.textContent = '∞';
+  kissTotalEl.classList.add('infinity');
+  kissInfinityNote.classList.remove('hidden');
+} else {
+  kissTotalEl.textContent = kissTotal;
+}
+
+// She goes to blow a kiss expecting a normal count — it flickers up fast and lands on ∞
+function revealInfinity(){
+  let ticks = 0;
+  const flicker = setInterval(()=>{
+    kissTotalEl.textContent = Math.floor(Math.random()*9000 + 1000);
+    ticks++;
+    if(ticks > 8){
+      clearInterval(flicker);
+      kissTotalEl.textContent = '∞';
+      kissTotalEl.classList.add('infinity');
+      kissInfinityNote.classList.remove('hidden');
+    }
+  }, 55);
+}
+function pulseInfinity(){
+  kissTotalEl.classList.remove('pulse');
+  void kissTotalEl.offsetWidth; // restart animation
+  kissTotalEl.classList.add('pulse');
+}
+
 kissBtn.addEventListener('click',(e)=>{
   kissTotal++;
-  kissTotalEl.textContent = kissTotal;
   localStorage.setItem('dolo-kiss-total', kissTotal);
+  if(!infinityRevealed){
+    infinityRevealed = true;
+    localStorage.setItem('dolo-kiss-infinity', '1');
+    revealInfinity();
+  } else {
+    pulseInfinity();
+  }
   const rect = kissBtn.getBoundingClientRect();
   for(let i=0;i<6;i++){
     const k = document.createElement('div');
@@ -707,7 +762,7 @@ const micStatus = document.getElementById('mic-status');
 const blowMeterFill = document.getElementById('blow-meter-fill');
 const gardenTotal = gardenMessages.length;
 
-let planted = 0;
+let planted = parseInt(localStorage.getItem('dolo-garden-planted') || '0', 10);
 let gardenToastTimer;
 let growEl = null;
 let growProgress = 0;
@@ -756,6 +811,7 @@ function placeSeed(x, y){
   growEl.style.top = y + 'px';
   growEl.style.transform = 'translate(-50%,-50%) scale(0.25)';
   growEl.style.opacity = '0.5';
+  growEl.addEventListener('click', (ev)=>{ ev.stopPropagation(); if(growEl) wiltSeed(); });
   bed.appendChild(growEl);
   emptyHint.classList.add('hide');
 }
@@ -784,6 +840,7 @@ function bloomSeed(){
 
   showGardenToast(msg);
   planted++;
+  localStorage.setItem('dolo-garden-planted', planted);
 
   const pct = Math.round((planted / gardenTotal) * 100);
   progressFill.style.width = pct + '%';
@@ -823,6 +880,50 @@ function wiltSeed(){
   el.style.opacity = '0';
   setTimeout(()=>el.remove(), 320);
 }
+
+// ---------- RESTORE GARDEN + SAVED MESSAGE LOG ----------
+const gardenLogEl = document.getElementById('garden-log');
+const toggleGardenLogBtn = document.getElementById('toggle-garden-log');
+
+function renderGardenLog(){
+  if(planted === 0){
+    gardenLogEl.innerHTML = '<div class="empty">nothing grown yet</div>';
+    return;
+  }
+  gardenLogEl.innerHTML = gardenMessages.slice(0, planted).map((m,i)=>
+    `<div class="kiss-log-item">${flowerEmojis[i % flowerEmojis.length]} ${m}</div>`
+  ).join('');
+}
+
+toggleGardenLogBtn.addEventListener('click', ()=>{
+  const hidden = gardenLogEl.classList.toggle('hidden');
+  toggleGardenLogBtn.textContent = hidden ? 'view saved messages' : 'hide saved messages';
+  if(!hidden) renderGardenLog();
+});
+
+function restoreGardenOnLoad(){
+  if(planted <= 0) return;
+  emptyHint.classList.add('hide');
+  for(let i=0;i<planted;i++){
+    const flower = document.createElement('div');
+    flower.className = 'flower';
+    flower.style.animation = 'none';
+    flower.style.transform = 'translate(-50%,-50%) scale(1)';
+    flower.textContent = flowerEmojis[i % flowerEmojis.length];
+    flower.style.left = (10 + Math.random()*80) + '%';
+    flower.style.top = (15 + Math.random()*70) + '%';
+    const msg = gardenMessages[i];
+    flower.addEventListener('click', (ev)=>{ ev.stopPropagation(); showGardenToast(msg); });
+    bed.appendChild(flower);
+  }
+  const pct = Math.round((planted / gardenTotal) * 100);
+  progressFill.style.width = pct + '%';
+  progressLabel.textContent = `${planted} / ${gardenTotal} planted`;
+  if(planted >= gardenTotal){
+    finale.classList.add('show');
+  }
+}
+restoreGardenOnLoad();
 
 // tap the bed: plant a seed at that spot
 bed.addEventListener('pointerdown', (e)=>{
